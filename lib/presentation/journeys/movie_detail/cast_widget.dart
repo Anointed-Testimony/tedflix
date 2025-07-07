@@ -27,78 +27,66 @@ class CastWidget extends StatelessWidget {
             );
           }
 
-          return Container(
-            height: Sizes.dimen_100.h.toDouble(),
-            child: ListView.builder(
-              shrinkWrap: true,
+          return SizedBox(
+            height: 120,
+            child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: state.casts.length,
+              itemCount: state.casts.length > 10 ? 10 : state.casts.length,
+              separatorBuilder: (context, index) => SizedBox(width: 16),
               itemBuilder: (context, index) {
                 final castEntity = state.casts[index];
-                return Container(
-                  height: Sizes.dimen_100.h.toDouble(),
-                  width: Sizes.dimen_160.w.toDouble(),
-                  child: Card(
-                    elevation: 1,
-                    margin: EdgeInsets.symmetric(
-                      horizontal: Sizes.dimen_8.w.toDouble(),
-                      vertical: Sizes.dimen_4.h.toDouble(),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(Sizes.dimen_8.w.toDouble()),
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
                       ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(8.w.toDouble()),
-                            ),
-                            child: CachedNetworkImage(
-                              height: Sizes.dimen_100.h.toDouble(),
-                              width: Sizes.dimen_160.w.toDouble(),
-                              imageUrl:
-                                  '${ApiConstants.BASE_IMAGE_URL}${castEntity.posterPath}',
-                              fit: BoxFit.fitWidth,
-                              placeholder: (context, url) => Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                              errorWidget: (context, url, error) => Center(
-                                child: Icon(Icons.error),
+                        ],
+                        border: Border.all(color: Colors.white24, width: 2),
+                      ),
+                      child: ClipOval(
+                        child: castEntity.posterPath != null && castEntity.posterPath.isNotEmpty
+                            ? CachedNetworkImage(
+                                imageUrl: '${ApiConstants.BASE_IMAGE_URL}${castEntity.posterPath}',
+                                fit: BoxFit.cover,
+                                width: 64,
+                                height: 64,
+                                placeholder: (context, url) => Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                errorWidget: (context, url, error) => Icon(Icons.person, size: 40, color: Colors.white38),
+                              )
+                            : Icon(Icons.person, size: 40, color: Colors.white38),
                               ),
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: Sizes.dimen_8.w.toDouble(),
-                          ),
+                    SizedBox(height: 8),
+                    SizedBox(
+                      width: 72,
                           child: Text(
                             castEntity.name,
-                            overflow: TextOverflow.fade,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
                             maxLines: 1,
-                            style: Theme.of(context).textTheme.vulcanBodyText2,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
                           ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                            left: Sizes.dimen_8.w.toDouble(),
-                            right: Sizes.dimen_8.w.toDouble(),
-                            bottom: Sizes.dimen_2.h.toDouble(),
-                          ),
+                    SizedBox(
+                      width: 72,
                           child: Text(
                             castEntity.character,
+                        textAlign: TextAlign.center,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
-                            style: Theme.of(context).textTheme.bodySmall,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.white70, fontSize: 12),
                           ),
                         ),
                       ],
-                    ),
-                  ),
                 );
               },
             ),

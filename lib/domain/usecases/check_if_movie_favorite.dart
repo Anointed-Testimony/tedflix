@@ -4,7 +4,7 @@ import 'package:tedflix_app/domain/entities/movie_params.dart';
 import 'package:tedflix_app/domain/repositories/movie_repository.dart';
 import 'package:tedflix_app/domain/usecases/usecase.dart';
 
-class CheckIfFavoriteMovie extends Usecase<bool, MovieParams> {
+class CheckIfFavoriteMovie extends UseCase<bool, MovieParams> {
   final MovieRepository movieRepository;
 
   CheckIfFavoriteMovie(this.movieRepository);

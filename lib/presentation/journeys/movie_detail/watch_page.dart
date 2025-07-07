@@ -2,21 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:async';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class WatchPage extends StatefulWidget {
   final String tmdbId;
+  final bool adWatched;
+  final String? customUrl;
 
-  const WatchPage({required this.tmdbId, Key? key}) : super(key: key);
+  const WatchPage({required this.tmdbId, this.adWatched = false, this.customUrl, Key? key}) : super(key: key);
 
   @override
   _WatchPageState createState() => _WatchPageState();
 }
 
 class _WatchPageState extends State<WatchPage> {
-  late final WebViewController _controller;
-  InterstitialAd? _interstitialAd;
-  Timer? _adTimer;
+  late final WebViewController _videoController;
+  late final WebViewController _adController;
+  Timer? _refreshTimer;
+  bool _isAdLoading = true;
+  late final String _iframeUrl;
+  final String _adUrl = "https://nauseousrocketjosephine.com/whk1ccx7d?key=d045c08d63014db27474e29afc28a58d";
 
   @override
   void initState() {
@@ -28,102 +32,169 @@ class _WatchPageState extends State<WatchPage> {
       DeviceOrientation.landscapeRight,
     ]);
 
-    // Initialize AdMob and load the first interstitial ad
-    MobileAds.instance.initialize();
-    _loadInterstitialAd();
+    _iframeUrl = widget.customUrl ?? "https://vidsrc.net/embed/movie?tmdb=${widget.tmdbId}";
+    print('[DEBUG] WatchPage iframe URL: ' + _iframeUrl);
 
-    // Start a timer for showing ads periodically
-    _startAdTimer();
+    final htmlContent = '''
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { 
+      margin: 0; 
+      padding: 0;
+      background: #000; 
+      width: 100vw; 
+      height: 100vh; 
+      overflow: hidden;
+    }
+    .iframe-container { 
+      width: 100vw; 
+      height: 100vh; 
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+    iframe { 
+      width: 100%; 
+      height: 100%; 
+      border: none; 
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="iframe-container">
+    <iframe 
+      src="$_iframeUrl" 
+      frameborder="0" 
+      allowfullscreen
+      allow="autoplay; fullscreen; picture-in-picture">
+    </iframe>
+  </div>
+</body>
+</html>
+''';
 
-    // Initialize WebViewController
-    _controller = WebViewController()
+    _videoController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageStarted: (String url) {
-            print('Page started loading: $url');
+          onNavigationRequest: (NavigationRequest request) {
+            // Only allow navigation to the original iframe URL or data URLs
+            if (request.url == _iframeUrl || 
+                request.url.startsWith('data:') || 
+                request.url.startsWith('about:') ||
+                request.url.startsWith('javascript:')) {
+              return NavigationDecision.navigate;
+            }
+            // Block all other navigation attempts gracefully
+            print('[DEBUG] Blocked redirect to: ' + request.url);
+            return NavigationDecision.prevent;
           },
           onPageFinished: (String url) {
-            print('Page finished loading: $url');
+            print('[DEBUG] Video page finished loading: ' + url);
           },
           onWebResourceError: (WebResourceError error) {
-            print('Web resource error: ${error.description}');
-          },
-          onNavigationRequest: (NavigationRequest request) {
-            if (!request.url.contains(widget.tmdbId)) {
-              print('Blocked navigation to: ${request.url}');
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
+            print('[DEBUG] Video WebView error: ${error.description}');
           },
         ),
       )
-      ..loadRequest(Uri.parse('https://vidsrc.xyz/embed/movie/${widget.tmdbId}'));
-  }
+      ..loadHtmlString(htmlContent);
 
-  // Load an interstitial ad
-  void _loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-8360591759937694/2892815350', // Replace with your actual Ad Unit ID
-      request: AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (InterstitialAd ad) {
+    // Initialize ad controller
+    _adController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onNavigationRequest: (NavigationRequest request) {
+            print('[DEBUG] Ad page navigation request: ${request.url}');
+            
+            // Handle special protocols that WebView can't handle
+            if (request.url.startsWith('tg://') || 
+                request.url.startsWith('whatsapp://') ||
+                request.url.startsWith('telegram://') ||
+                request.url.startsWith('mailto:') ||
+                request.url.startsWith('tel:')) {
+              print('[DEBUG] Blocked special protocol: ${request.url}');
+              return NavigationDecision.prevent;
+            }
+            
+            // Allow all other navigation for ad content
+            print('[DEBUG] Allowing ad navigation to: ${request.url}');
+            return NavigationDecision.navigate;
+          },
+          onPageStarted: (String url) {
+            print('[DEBUG] Ad page started loading: ' + url);
           setState(() {
-            _interstitialAd = ad;
+              _isAdLoading = true;
           });
-          // Set the full-screen callback
-          _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (InterstitialAd ad) {
-              ad.dispose();
-              _loadInterstitialAd(); // Load a new ad after the current one is shown
-            },
-            onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-              print('Ad failed to show: $error');
-              ad.dispose();
-              _loadInterstitialAd(); // Attempt to load a new ad if the current one fails
-            },
-          );
+          },
+          onPageFinished: (String url) {
+            print('[DEBUG] Ad page finished loading: ' + url);
+            setState(() {
+              _isAdLoading = false;
+            });
+          },
+          onWebResourceError: (WebResourceError error) {
+            print('[DEBUG] Ad page WebView error: ${error.description}');
+            setState(() {
+              _isAdLoading = false;
+            });
         },
-        onAdFailedToLoad: (LoadAdError error) {
-          print('Interstitial ad failed to load: $error');
-        },
-      ),
-    );
-  }
+        ),
+      )
+      ..loadRequest(Uri.parse(_adUrl));
 
-  // Show the interstitial ad if loaded
-  void _showInterstitialAd() {
-    if (_interstitialAd != null) {
-      _interstitialAd!.show();
-      _interstitialAd = null; // Reset the ad to null after showing
-    } else {
-      print('Interstitial ad is not ready yet.');
+    // Start the 5-minute refresh timer for the ad page
+    _startRefreshTimer();
     }
+
+  void _startRefreshTimer() {
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      _refreshAdPage();
+    });
   }
 
-  // Start a timer to show ads periodically (every 5 minutes)
-  void _startAdTimer() {
-    _adTimer = Timer.periodic(Duration(minutes: 5), (timer) {
-      _showInterstitialAd();
-    });
+  void _refreshAdPage() {
+    if (mounted) {
+      print('[DEBUG] Refreshing ad page after 5 minutes');
+      _adController.reload();
+    }
   }
 
   @override
   void dispose() {
     // Reset orientation back to portrait when leaving the page
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
-    // Cancel the ad timer and dispose of any ad resources
-    _adTimer?.cancel();
-    _interstitialAd?.dispose();
-
+    _refreshTimer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: WebViewWidget(controller: _controller),
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          // Ad page underneath (full screen)
+          WebViewWidget(
+            controller: _adController,
+          ),
+          
+          // Video player on top (full screen)
+          WebViewWidget(
+            controller: _videoController,
+          ),
+          
+
+        ],
+      ),
     );
   }
 }

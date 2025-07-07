@@ -4,7 +4,7 @@ import 'package:tedflix_app/domain/entities/movie_params.dart';
 import 'package:tedflix_app/domain/repositories/movie_repository.dart';
 import 'package:tedflix_app/domain/usecases/usecase.dart';
 
-class DeleteFavoriteMovie extends Usecase<void, MovieParams> {
+class DeleteFavoriteMovie extends UseCase<void, MovieParams> {
   final MovieRepository movieRepository;
 
   DeleteFavoriteMovie(this.movieRepository);

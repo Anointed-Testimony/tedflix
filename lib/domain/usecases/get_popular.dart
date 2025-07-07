@@ -5,12 +5,13 @@ import 'package:tedflix_app/domain/entities/no_params.dart';
 import 'package:tedflix_app/domain/repositories/movie_repository.dart';
 import 'package:tedflix_app/domain/usecases/usecase.dart';
 
-class GetPopular extends Usecase<List<MovieEntity>, NoParams> {
+class GetPopular extends UseCase<List<MovieEntity>, NoParams> {
   final MovieRepository repository;
 
   GetPopular(this.repository);
 
-  Future<Either<AppError, List<MovieEntity>>> call(NoParams noParams) async{
+  @override
+  Future<Either<AppError, List<MovieEntity>>> call(NoParams params) async {
     return await repository.getPopular();
   }
 }

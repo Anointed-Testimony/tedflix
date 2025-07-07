@@ -4,7 +4,7 @@ import 'package:tedflix_app/domain/entities/movie_entity.dart';
 import 'package:tedflix_app/domain/repositories/movie_repository.dart';
 import 'package:tedflix_app/domain/usecases/usecase.dart';
 
-class SaveMovie extends Usecase<void, MovieEntity> {
+class SaveMovie extends UseCase<void, MovieEntity> {
   final MovieRepository movieRepository;
 
   SaveMovie(this.movieRepository);

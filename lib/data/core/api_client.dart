@@ -8,7 +8,7 @@ class ApiClient {
 
   ApiClient(this._client);
 
-  Future<dynamic> get(String path, {Map<String, String>? params}) async {
+  Future<Response> get(String path, {Map<String, String>? params}) async {
     final uri = Uri.parse(getPath(path, params ?? {}));
     final response = await _client.get(
       uri,
@@ -17,11 +17,11 @@ class ApiClient {
       },
     );
 
-    await Future.delayed(Duration(milliseconds: 10000));
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      return response;
     } else {
-      throw Exception('Failed to load data: ${response.statusCode} ${response.reasonPhrase}');
+      throw Exception(
+          'Failed to load data: ${response.statusCode} ${response.reasonPhrase}');
     }
   }
 
@@ -33,7 +33,7 @@ class ApiClient {
 
     final uri = Uri.parse('${ApiConstants.BASE_URL}$path');
     final queryString = Uri(queryParameters: queryParameters).query;
-    
+
     return uri.replace(query: queryString).toString();
   }
 }

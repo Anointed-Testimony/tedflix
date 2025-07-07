@@ -9,7 +9,8 @@ import 'package:tedflix_app/presentation/themes/theme_color.dart';
 class LoadingScreen extends StatelessWidget {
   final Widget screen;
 
-  const LoadingScreen({required Key key, required this.screen}) : super(key: key);
+  const LoadingScreen({required Key key, required this.screen})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

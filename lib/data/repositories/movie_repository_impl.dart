@@ -70,7 +70,8 @@ class MovieRepositoryImpl extends MovieRepository {
   @override
   Future<Either<AppError, MovieDetailModel>> getMovieDetail(int id) async {
     try {
-      final movie = await remoteDataSource.getMovieDetail(id); // Ensure correct id is passed
+      final movie = await remoteDataSource
+          .getMovieDetail(id); // Ensure correct id is passed
       return Right(movie);
     } on SocketException {
       return Left(AppError(AppErrorType.network));
@@ -82,7 +83,8 @@ class MovieRepositoryImpl extends MovieRepository {
   @override
   Future<Either<AppError, List<CastModel>>> getCastCrew(int id) async {
     try {
-      final castCrew = await remoteDataSource.getCastCrew(id); // Ensure correct id is passed
+      final castCrew =
+          await remoteDataSource.getCastCrew(id); // Ensure correct id is passed
       return Right(castCrew);
     } on SocketException {
       return Left(AppError(AppErrorType.network));
@@ -90,9 +92,10 @@ class MovieRepositoryImpl extends MovieRepository {
       return Left(AppError(AppErrorType.network));
     }
   }
-  
+
   @override
-  Future<Either<AppError, List<MovieModel>>> getSearchedMovies(String searchTerm) async {
+  Future<Either<AppError, List<MovieModel>>> getSearchedMovies(
+      String searchTerm) async {
     try {
       final movies = await remoteDataSource.getSearchedMovies(searchTerm);
       return Right(movies);
@@ -102,7 +105,7 @@ class MovieRepositoryImpl extends MovieRepository {
       return Left(AppError(AppErrorType.network));
     }
   }
-  
+
   @override
   Future<Either<AppError, bool>> checkIfMovieFavorite(int movieId) async {
     try {
@@ -112,7 +115,7 @@ class MovieRepositoryImpl extends MovieRepository {
       return Left(AppError(AppErrorType.database));
     }
   }
-  
+
   @override
   Future<Either<AppError, void>> deleteFavoriteMovie(int movieId) async {
     try {
@@ -122,7 +125,7 @@ class MovieRepositoryImpl extends MovieRepository {
       return Left(AppError(AppErrorType.database));
     }
   }
-  
+
   @override
   Future<Either<AppError, List<MovieEntity>>> getFavoriteMovies() async {
     try {
@@ -132,7 +135,7 @@ class MovieRepositoryImpl extends MovieRepository {
       return Left(AppError(AppErrorType.database));
     }
   }
-  
+
   @override
   Future<Either<AppError, void>> saveMovie(MovieEntity movieEntity) async {
     try {

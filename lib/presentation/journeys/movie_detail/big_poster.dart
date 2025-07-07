@@ -35,24 +35,70 @@ class BigPoster extends StatelessWidget {
           child: CachedNetworkImage(
             imageUrl: '${ApiConstants.BASE_IMAGE_URL}${movie.posterPath}',
             width: ScreenUtil.screenWidth,
+            fit: BoxFit.cover,
+            placeholder: (context, url) => const Center(
+              child: CircularProgressIndicator(color: Colors.white),
+            ),
+            errorWidget: (context, url, error) => const Center(
+              child: Icon(Icons.error, color: Colors.white),
+            ),
           ),
         ),
         Positioned(
           left: 0,
           right: 0,
           bottom: 0,
-          child: ListTile(
-            title: Text(
-              movie.title,
-              style: Theme.of(context).textTheme.headlineSmall,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  Colors.black.withOpacity(0.8),
+                  Colors.transparent,
+                ],
+              ),
             ),
-            subtitle: Text(
-              movie.releaseDate,
-              style: Theme.of(context).textTheme.greySubtitle1,
-            ),
-            trailing: Text(
-              movie.voteAverage.convertToPercentageString(),
-              style: Theme.of(context).textTheme.violetHeadline6,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  movie.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      movie.releaseDate,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    const Icon(
+                      Icons.star,
+                      color: Colors.amber,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      movie.voteAverage.convertToPercentageString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),

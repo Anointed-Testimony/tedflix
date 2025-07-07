@@ -10,10 +10,31 @@ class AppErrorWidget extends StatelessWidget {
   final VoidCallback onPressed;
 
   const AppErrorWidget({
-    Key? key, // Use Key? to make it optional
+    Key? key,
     required this.errorType,
     required this.onPressed,
   }) : super(key: key);
+
+  String _getErrorMessage() {
+    switch (errorType) {
+      case AppErrorType.api:
+        return 'Something went wrong...';
+      case AppErrorType.network:
+        return 'Please check your network connection and press Retry button';
+      case AppErrorType.database:
+        return 'Database error occurred. Please try again.';
+      case AppErrorType.tvShowNotFound:
+        return 'TV Show not found. Please try again.';
+      case AppErrorType.seasonNotFound:
+        return 'Season not found. Please try again.';
+      case AppErrorType.episodeNotFound:
+        return 'Episode not found. Please try again.';
+      case AppErrorType.watchProgressNotFound:
+        return 'Watch progress not found. Please try again.';
+      case AppErrorType.invalidWatchProgress:
+        return 'Invalid watch progress. Please try again.';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +45,7 @@ class AppErrorWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            errorType == AppErrorType.api
-                ? 'Something went wrong...'
-                : 'Please check your network connection and press Retry button',
+            _getErrorMessage(),
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleMedium,
           ),

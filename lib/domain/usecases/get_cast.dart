@@ -5,7 +5,7 @@ import 'package:tedflix_app/domain/entities/movie_params.dart';
 import 'package:tedflix_app/domain/repositories/movie_repository.dart';
 import 'package:tedflix_app/domain/usecases/usecase.dart';
 
-class GetCast extends Usecase<List<CastEntity>, MovieParams> {
+class GetCast extends UseCase<List<CastEntity>, MovieParams> {
   final MovieRepository repository;
 
   GetCast(this.repository);

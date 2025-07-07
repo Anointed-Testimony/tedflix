@@ -10,29 +10,36 @@ abstract class MovieTabbedState extends Equatable {
 }
 
 class MovieTabbedInitial extends MovieTabbedState {
-  MovieTabbedInitial({required super.currentTabIndex});
+  const MovieTabbedInitial() : super(currentTabIndex: 0);
+}
+
+class MovieTabLoading extends MovieTabbedState {
+  const MovieTabLoading({required int currentTabIndex})
+      : super(currentTabIndex: currentTabIndex);
 }
 
 class MovieTabChanged extends MovieTabbedState {
   final List<MovieEntity> movies;
+  final List<TVShowEntity> tvShows;
 
-  const MovieTabChanged({required int currentTabIndex, required this.movies})
-      : super(currentTabIndex: currentTabIndex);
+  const MovieTabChanged({
+    required int currentTabIndex,
+    this.movies = const [],
+    this.tvShows = const [],
+  }) : super(currentTabIndex: currentTabIndex);
 
   @override
-  List<Object> get props => [currentTabIndex, movies];
+  List<Object> get props => [currentTabIndex, movies, tvShows];
 }
 
 class MovieTabLoadError extends MovieTabbedState {
   final AppErrorType errorType;
 
-  const MovieTabLoadError({required int currentTabIndex, required this.errorType})
-      : super(currentTabIndex: currentTabIndex);
+  const MovieTabLoadError({
+    required int currentTabIndex,
+    required this.errorType,
+  }) : super(currentTabIndex: currentTabIndex);
 
   @override
-  List<Object> get props => [currentTabIndex, errorType]; // Added to props
-}
-
-class MovieTabLoading extends MovieTabbedState {
-  const MovieTabLoading({required int currentTabIndex}) : super(currentTabIndex: currentTabIndex); // Added required parameter
+  List<Object> get props => [currentTabIndex, errorType];
 }

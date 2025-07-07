@@ -30,46 +30,95 @@ class SearchMovieCard extends StatelessWidget {
           ),
         );
       },
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: Sizes.dimen_16.w.toDouble(),
-          vertical: Sizes.dimen_2.h.toDouble(),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.1),
+            width: 1,
+          ),
         ),
+      child: Padding(
+          padding: EdgeInsets.all(12),
         child: Row(
           children: [
-            Padding(
-              padding: EdgeInsets.all(Sizes.dimen_8.w.toDouble()),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(Sizes.dimen_4.w.toDouble()),
+                  borderRadius: BorderRadius.circular(12),
                 child: CachedNetworkImage(
                   imageUrl: '${ApiConstants.BASE_IMAGE_URL}${movie.posterPath}',
-                  width: Sizes.dimen_80.w.toDouble(),
+                    width: 80,
+                    height: 120,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      width: 80,
+                      height: 120,
+                      color: Colors.grey.withOpacity(0.3),
+                      child: Icon(
+                        Icons.movie,
+                        color: Colors.white.withOpacity(0.5),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      width: 80,
+                      height: 120,
+                      color: Colors.grey.withOpacity(0.3),
+                      child: Icon(
+                        Icons.error,
+                        color: Colors.white.withOpacity(0.5),
+                      ),
+                    ),
                 ),
               ),
             ),
+              SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
                     movie.title,
-                    style: Theme.of(context).textTheme.titleMedium,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                   ),
+                    SizedBox(height: 8),
                   Text(
                     movie.overview ?? '',
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: Colors.grey),
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                        height: 1.4,
+                      ),
                   ),
                 ],
               ),
             ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white.withOpacity(0.5),
+                size: 16,
+              ),
           ],
+          ),
         ),
       ),
     );

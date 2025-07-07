@@ -25,7 +25,8 @@ class MovieRemoteDataSourceImpl extends MovieRemoteDataSource {
   @override
   Future<List<MovieModel>> getTrending() async {
     final response = await _client.get('trending/movie/day', params: {});
-    final movies = MoviesResultModel.fromJson(response).movies ?? [];
+    final json = jsonDecode(response.body);
+    final movies = MoviesResultModel.fromJson(json).movies ?? [];
     print(movies);
     return movies;
   }
@@ -33,7 +34,8 @@ class MovieRemoteDataSourceImpl extends MovieRemoteDataSource {
   @override
   Future<List<MovieModel>> getPopular() async {
     final response = await _client.get('movie/popular', params: {});
-    final movies = MoviesResultModel.fromJson(response).movies ?? [];
+    final json = jsonDecode(response.body);
+    final movies = MoviesResultModel.fromJson(json).movies ?? [];
     print(movies);
     return movies;
   }
@@ -41,7 +43,8 @@ class MovieRemoteDataSourceImpl extends MovieRemoteDataSource {
   @override
   Future<List<MovieModel>> getComingSoon() async {
     final response = await _client.get('movie/upcoming', params: {});
-    final movies = MoviesResultModel.fromJson(response).movies ?? [];
+    final json = jsonDecode(response.body);
+    final movies = MoviesResultModel.fromJson(json).movies ?? [];
     print(movies);
     return movies;
   }
@@ -49,7 +52,8 @@ class MovieRemoteDataSourceImpl extends MovieRemoteDataSource {
   @override
   Future<List<MovieModel>> getPlayingNow() async {
     final response = await _client.get('movie/now_playing', params: {});
-    final movies = MoviesResultModel.fromJson(response).movies ?? [];
+    final json = jsonDecode(response.body);
+    final movies = MoviesResultModel.fromJson(json).movies ?? [];
     print(movies);
     return movies;
   }
@@ -57,7 +61,8 @@ class MovieRemoteDataSourceImpl extends MovieRemoteDataSource {
   @override
   Future<MovieDetailModel> getMovieDetail(int id) async {
     final response = await _client.get('movie/$id', params: {});
-    final movie = MovieDetailModel.fromJson((response));
+    final json = jsonDecode(response.body);
+    final movie = MovieDetailModel.fromJson(json);
     print(movie);
     return movie;
   }
@@ -65,7 +70,8 @@ class MovieRemoteDataSourceImpl extends MovieRemoteDataSource {
   @override
   Future<List<CastModel>> getCastCrew(int id) async {
     final response = await _client.get('movie/$id/credits', params: {});
-    final cast = CastCrewResultModel.fromJson(response).cast ?? [];
+    final json = jsonDecode(response.body);
+    final cast = CastCrewResultModel.fromJson(json).cast ?? [];
     print(cast);
     return cast;
   }
@@ -75,10 +81,11 @@ class MovieRemoteDataSourceImpl extends MovieRemoteDataSource {
     final response = await _client.get(
       'search/movie',
       params: {
-        'query' : searchTerm,
-      }
+        'query': searchTerm,
+      },
     );
-    final movies = MoviesResultModel.fromJson(response).movies ?? [];
+    final json = jsonDecode(response.body);
+    final movies = MoviesResultModel.fromJson(json).movies ?? [];
     print(movies);
     return movies;
   }

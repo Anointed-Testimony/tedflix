@@ -5,7 +5,7 @@ import 'package:tedflix_app/domain/entities/movie_search_params.dart';
 import 'package:tedflix_app/domain/repositories/movie_repository.dart';
 import 'package:tedflix_app/domain/usecases/usecase.dart';
 
-class SearchMovies extends Usecase<List<MovieEntity>, MovieSearchParams> {
+class SearchMovies extends UseCase<List<MovieEntity>, MovieSearchParams> {
   final MovieRepository repository;
 
   SearchMovies(this.repository);
